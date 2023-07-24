@@ -36,7 +36,7 @@ export default function Search() {
       favs.splice(idx, 1);
       localStorage.setItem("FavMovies", JSON.stringify(favs));
       setFavorites(favs)
-    }
+    },[]
   )
 
   const renderMovie = (movie, from) => {
