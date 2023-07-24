@@ -34,7 +34,7 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 }));
 
 const defaultImg = 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fih1.redbubble.net%2Fimage.195569260.8857%2Fflat%2C550x550%2C075%2Cf.u2.jpg&f=1&nofb=1&ipt=cf0f5cd8b535f93e869cba4166314b181e8ccf8181136ae3c92ec791e785b234&ipo=images'
-export default function Movie({ movie, defaultFavoriteValue, from }) {
+export default function Movie({ movie, defaultFavoriteValue, from,clickHandler }) {
   
   const [expanded, setExpanded] = React.useState(false);
   const [isAddedToFavorites, setIsAddedToFavorites] = React.useState(defaultFavoriteValue);
@@ -51,19 +51,6 @@ export default function Movie({ movie, defaultFavoriteValue, from }) {
       setIsAddedToFavorites(true);
       return
     }
-  }
-
-  const deleteMovieFromFavorites=(id)=>{
-    const favs = getFavoriteMovies()
-    let idx
-    for (let index = 0; index < favs.length; index++) {
-      if(favs[index]['id']===id){
-        idx=index
-      }
-    }
-    favs.splice(idx, 1);
-    localStorage.setItem("FavMovies", JSON.stringify(favs));
-    setIsAddedToFavorites(false);
   }
 
   let rate = Math.round(movie.rating * 10) / 10;
@@ -115,7 +102,7 @@ export default function Movie({ movie, defaultFavoriteValue, from }) {
           >
             <FontAwesomeIcon
               icon={faTrash}
-              onClick={() =>  deleteMovieFromFavorites(movie.id)}
+              onClick={() => {clickHandler(movie.id); setIsAddedToFavorites(!isAddedToFavorites)}}
             />
           </IconButton> :
           <IconButton
@@ -123,7 +110,7 @@ export default function Movie({ movie, defaultFavoriteValue, from }) {
           >
             <FontAwesomeIcon
               icon={faHeart}
-              onClick={() => (isAddedToFavorites ? null : addToFavorites(movie))}
+              onClick={() =>  addToFavorites(movie)}
             />
           </IconButton>
         }

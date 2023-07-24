@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
+import React, { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import request from "./Request";
 import axios from "axios";
 import FlatList from "flatlist-react";
@@ -11,7 +11,7 @@ import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import Badge from "react-bootstrap/Badge";
-import { getFavoriteMovies, getMovies,searchMovieByName } from "./utils";
+import { getFavoriteMovies, getMovies, searchMovieByName } from "./utils";
 
 export default function Search() {
   const [movies, setMovies] = useState([]);
@@ -21,8 +21,23 @@ export default function Search() {
   const favs = useMemo(() => getFavoriteMovies(), [favorites]);
 
   useEffect(() => {
-    getMovies().then((res)=>setMovies(res)) 
+    getMovies().then((res) => setMovies(res))
   }, []);
+
+  const deleteMovieFromFavorites = useCallback(
+    (movieId) => {
+      const favs = getFavoriteMovies()
+      let idx
+      for (let index = 0; index < favs.length; index++) {
+        if (favs[index]['id'] === movieId) {
+          idx = index
+        }
+      }
+      favs.splice(idx, 1);
+      localStorage.setItem("FavMovies", JSON.stringify(favs));
+      setFavorites(favs)
+    }
+  )
 
   const renderMovie = (movie, from) => {
     let isOnFavorites = favorites.find((o) => o.id === movie.id) ? true : false;
@@ -31,14 +46,14 @@ export default function Search() {
         key={movie.id}
         className="col-12 col-sm-6 col-md-6 col-lg-4 px-2 py-2"
       >
-        <Movie movie={movie} defaultFavoriteValue={isOnFavorites} from={from} />
+        <Movie movie={movie} defaultFavoriteValue={isOnFavorites} from={from} clickHandler={deleteMovieFromFavorites} />
       </div>
     );
   };
 
   const handleSubmitSearch = (event) => {
     event.preventDefault();
-    searchMovieByName(searchMovie).then(res=>{
+    searchMovieByName(searchMovie).then(res => {
       setMovies(res)
       latestSearch.current.push(searchMovie)
       setSearchMovie("")
@@ -98,7 +113,7 @@ export default function Search() {
               <Tab>
                 <h2>Movies</h2>
               </Tab>
-              <Tab onClick={()=>setFavorites(getFavoriteMovies())}>
+              <Tab onClick={() => setFavorites(getFavoriteMovies())}>
                 <h2>Favorites</h2>
               </Tab>
             </TabList>
