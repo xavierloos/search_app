@@ -117,7 +117,7 @@ export default function Search() {
             <TabPanel>
               <div className="col-12 d-flex flex-row flex-wrap">
                 <FlatList
-                  list={favorites}
+                  list={favs}
                   renderItem={(movie) => renderMovie(movie, "favorites")}
                   renderWhenEmpty={() => <div>No favorites yet</div>}
                 />
