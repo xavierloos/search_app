@@ -11,21 +11,21 @@ import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import Badge from "react-bootstrap/Badge";
-import { getFavorites } from "./utils";
+import { getFavoriteMovies, getMovies,searchMovieByName } from "./utils";
 
 export default function Search() {
   const [movies, setMovies] = useState([]);
   const [searchMovie, setSearchMovie] = useState();
-  const [favorites, setFavorites] = useState(getFavorites());
+  const [favorites, setFavorites] = useState(getFavoriteMovies());
   const latestSearch = useRef(new Array());
-  const favs = useMemo(() => getFavorites(), [favorites]);
+  const favs = useMemo(() => getFavoriteMovies(), [favorites]);
 
   useEffect(() => {
-    axios.get(request.movies).then((res) => setMovies(res.data.results));
+    getMovies().then((res)=>setMovies(res)) 
   }, []);
 
   const favoritesTab = () => {
-    return setFavorites(getFavorites());
+    return setFavorites(getFavoriteMovies());
   };
 
   const renderMovie = (movie, from) => {
@@ -35,18 +35,18 @@ export default function Search() {
         key={movie.id}
         className="col-12 col-sm-6 col-md-6 col-lg-4 px-2 py-2"
       >
-        <Movie movie={movie} isOnFavorites={isOnFavorites} from={from} />
+        <Movie movie={movie} defaultFavoriteValue={isOnFavorites} from={from} />
       </div>
     );
   };
 
   const handleSubmitSearch = (event) => {
     event.preventDefault();
-    axios
-      .get(request.search + "&query=" + searchMovie)
-      .then((res) => setMovies(res.data.results));
-    latestSearch.current.push(searchMovie);
-    setSearchMovie("");
+    searchMovieByName(searchMovie).then(res=>{
+      setMovies(res)
+      latestSearch.current.push(searchMovie)
+      setSearchMovie("")
+    })
   };
 
   return (

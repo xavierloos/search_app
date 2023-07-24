@@ -9,15 +9,14 @@ import Collapse from "@mui/material/Collapse";
 import Avatar from "@mui/material/Avatar";
 import IconButton, { IconButtonProps } from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-import { red } from "@mui/material/colors";
-import Text from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faHeart,
   faChevronCircleDown,
   faCheck,
+  faTrash
 } from "@fortawesome/free-solid-svg-icons";
-import { getFavorites } from "./utils";
+import { getFavoriteMovies } from "./utils";
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -34,32 +33,40 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
   }),
 }));
 
-export default function Movie({ movie, isOnFavorites, from }) {
+const defaultImg = 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fih1.redbubble.net%2Fimage.195569260.8857%2Fflat%2C550x550%2C075%2Cf.u2.jpg&f=1&nofb=1&ipt=cf0f5cd8b535f93e869cba4166314b181e8ccf8181136ae3c92ec791e785b234&ipo=images'
+export default function Movie({ movie, defaultFavoriteValue, from }) {
+  console.log(defaultFavoriteValue);
   const [expanded, setExpanded] = React.useState(false);
-  const [added, setAdded] = React.useState(isOnFavorites);
+  const [isAddedToFavorites, setIsAddedToFavorites] = React.useState(defaultFavoriteValue);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
-  const addToFav = (movie) => {
-    if (!added) {
-      const destructuredData = {
-        id: movie.id,
-        vote_average: movie.vote_average,
-        release_date: movie.release_date,
-        original_title: movie.original_title,
-        backdrop_path: movie.backdrop_path,
-        overview: movie.overview,
-      };
-      const favs = getFavorites();
-      favs.push(destructuredData);
+  const addToFavorites = (movie) => {
+    if (!isAddedToFavorites) {
+      const favs = getFavoriteMovies();
+      favs.push(movie);
       localStorage.setItem("FavMovies", JSON.stringify(favs));
-      setAdded(true);
+      setIsAddedToFavorites(true);
+      return
     }
-  };
+  }
 
-  let rate = Math.round(movie.vote_average * 10) / 10;
+  const deleteMovieFromFavorites=(id)=>{
+    const favs = getFavoriteMovies()
+    let idx
+    for (let index = 0; index < favs.length; index++) {
+      if(favs[index]['id']===id){
+        idx=index
+      }
+    }
+    favs.splice(idx, 1);
+    localStorage.setItem("FavMovies", JSON.stringify(favs));
+    setIsAddedToFavorites(false);
+  }
+
+  let rate = Math.round(movie.rating * 10) / 10;
 
   let bg = null;
 
@@ -71,6 +78,10 @@ export default function Movie({ movie, isOnFavorites, from }) {
     bg = `green`;
   }
 
+  let image_url = 'https://image.tmdb.org/t/p/original/'
+
+  let movie_poster = movie.poster_2 != null ? image_url + movie.poster_2 : movie.poster != null ? image_url + movie.poster : defaultImg
+
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardHeader
@@ -81,7 +92,7 @@ export default function Movie({ movie, isOnFavorites, from }) {
         }
         title={
           <span className="text-truncate text-break" style={{ width: "10px" }}>
-            {movie.original_title}
+            {movie.title}
           </span>
         }
         subheader={`${movie.release_date}`}
@@ -89,11 +100,7 @@ export default function Movie({ movie, isOnFavorites, from }) {
       <CardMedia
         component="img"
         height="194"
-        image={
-          movie.backdrop_path != null
-            ? `https://image.tmdb.org/t/p/original/${movie.backdrop_path}`
-            : `https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fih1.redbubble.net%2Fimage.195569260.8857%2Fflat%2C550x550%2C075%2Cf.u2.jpg&f=1&nofb=1&ipt=cf0f5cd8b535f93e869cba4166314b181e8ccf8181136ae3c92ec791e785b234&ipo=images`
-        }
+        image={movie_poster}
         alt={`movie-${movie.id}`}
       />
       <CardContent>
@@ -102,17 +109,24 @@ export default function Movie({ movie, isOnFavorites, from }) {
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
-        <IconButton
-          aria-label="add to favorites"
-          disabled={added}
-          className={`${from == "favorites" ? "d-none" : ""}`}
-        >
-          <FontAwesomeIcon
-            icon={added ? faCheck : faHeart}
-            onClick={() => (added ? null : addToFav(movie))}
-          />
-        </IconButton>
-
+        {isAddedToFavorites ?
+          <IconButton
+            aria-label="Remove from favorites"
+          >
+            <FontAwesomeIcon
+              icon={faTrash}
+              onClick={() =>  deleteMovieFromFavorites(movie.id)}
+            />
+          </IconButton> :
+          <IconButton
+            aria-label="add to favorites" 
+          >
+            <FontAwesomeIcon
+              icon={faHeart}
+              onClick={() => (isAddedToFavorites ? null : addToFavorites(movie))}
+            />
+          </IconButton>
+        }
         <ExpandMore
           expand={expanded}
           onClick={handleExpandClick}
