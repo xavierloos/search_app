@@ -24,10 +24,6 @@ export default function Search() {
     getMovies().then((res)=>setMovies(res)) 
   }, []);
 
-  const favoritesTab = () => {
-    return setFavorites(getFavoriteMovies());
-  };
-
   const renderMovie = (movie, from) => {
     let isOnFavorites = favorites.find((o) => o.id === movie.id) ? true : false;
     return (
@@ -102,7 +98,7 @@ export default function Search() {
               <Tab>
                 <h2>Movies</h2>
               </Tab>
-              <Tab onClick={favoritesTab}>
+              <Tab onClick={()=>setFavorites(getFavoriteMovies())}>
                 <h2>Favorites</h2>
               </Tab>
             </TabList>
