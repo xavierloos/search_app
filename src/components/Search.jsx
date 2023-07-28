@@ -1,6 +1,10 @@
-import React, { useEffect, useState, useMemo, useRef, useCallback } from "react";
-import request from "./Request";
-import axios from "axios";
+import React, {
+  useEffect,
+  useState,
+  useMemo,
+  useRef,
+  useCallback,
+} from "react";
 import FlatList from "flatlist-react";
 import Movie from "./Movie";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
@@ -11,7 +15,11 @@ import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import Badge from "react-bootstrap/Badge";
-import { getFavoriteMovies, getMovies, searchMovieByName } from "./utils";
+import {
+  getFavoriteMovies,
+  getMovies,
+  searchMovieByName,
+} from "../utils/utils";
 
 export default function Search() {
   const [movies, setMovies] = useState([]);
@@ -21,23 +29,21 @@ export default function Search() {
   const favs = useMemo(() => getFavoriteMovies(), [favorites]);
 
   useEffect(() => {
-    getMovies().then((res) => setMovies(res))
+    getMovies().then((res) => setMovies(res));
   }, []);
 
-  const deleteMovieFromFavorites = useCallback(
-    (movieId) => {
-      const favs = getFavoriteMovies()
-      let idx
-      for (let index = 0; index < favs.length; index++) {
-        if (favs[index]['id'] === movieId) {
-          idx = index
-        }
+  const deleteMovieFromFavorites = useCallback((movieId) => {
+    const favs = getFavoriteMovies();
+    let idx;
+    for (let index = 0; index < favs.length; index++) {
+      if (favs[index]["id"] === movieId) {
+        idx = index;
       }
-      favs.splice(idx, 1);
-      localStorage.setItem("FavMovies", JSON.stringify(favs));
-      setFavorites(favs)
-    },[]
-  )
+    }
+    favs.splice(idx, 1);
+    localStorage.setItem("FavMovies", JSON.stringify(favs));
+    setFavorites(favs);
+  }, []);
 
   const renderMovie = (movie, from) => {
     let isOnFavorites = favorites.find((o) => o.id === movie.id) ? true : false;
@@ -46,18 +52,23 @@ export default function Search() {
         key={movie.id}
         className="col-12 col-sm-6 col-md-6 col-lg-4 px-2 py-2"
       >
-        <Movie movie={movie} defaultFavoriteValue={isOnFavorites} from={from} clickHandler={deleteMovieFromFavorites} />
+        <Movie
+          movie={movie}
+          defaultFavoriteValue={isOnFavorites}
+          from={from}
+          clickHandler={deleteMovieFromFavorites}
+        />
       </div>
     );
   };
 
   const handleSubmitSearch = (event) => {
     event.preventDefault();
-    searchMovieByName(searchMovie).then(res => {
-      setMovies(res)
-      latestSearch.current.push(searchMovie)
-      setSearchMovie("")
-    })
+    searchMovieByName(searchMovie).then((res) => {
+      setMovies(res);
+      latestSearch.current.push(searchMovie);
+      setSearchMovie("");
+    });
   };
 
   return (

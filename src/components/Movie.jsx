@@ -14,9 +14,9 @@ import {
   faHeart,
   faChevronCircleDown,
   faCheck,
-  faTrash
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
-import { getFavoriteMovies } from "./utils";
+import { getFavoriteMovies } from "../utils/utils";
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -33,11 +33,17 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
   }),
 }));
 
-const defaultImg = 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fih1.redbubble.net%2Fimage.195569260.8857%2Fflat%2C550x550%2C075%2Cf.u2.jpg&f=1&nofb=1&ipt=cf0f5cd8b535f93e869cba4166314b181e8ccf8181136ae3c92ec791e785b234&ipo=images'
-export default function Movie({ movie, defaultFavoriteValue, from,clickHandler }) {
-  
+const defaultImg =
+  "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fih1.redbubble.net%2Fimage.195569260.8857%2Fflat%2C550x550%2C075%2Cf.u2.jpg&f=1&nofb=1&ipt=cf0f5cd8b535f93e869cba4166314b181e8ccf8181136ae3c92ec791e785b234&ipo=images";
+export default function Movie({
+  movie,
+  defaultFavoriteValue,
+  from,
+  clickHandler,
+}) {
   const [expanded, setExpanded] = React.useState(false);
-  const [isAddedToFavorites, setIsAddedToFavorites] = React.useState(defaultFavoriteValue);
+  const [isAddedToFavorites, setIsAddedToFavorites] =
+    React.useState(defaultFavoriteValue);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -49,9 +55,9 @@ export default function Movie({ movie, defaultFavoriteValue, from,clickHandler }
       favs.push(movie);
       localStorage.setItem("FavMovies", JSON.stringify(favs));
       setIsAddedToFavorites(true);
-      return
+      return;
     }
-  }
+  };
 
   let rate = Math.round(movie.rating * 10) / 10;
 
@@ -65,9 +71,14 @@ export default function Movie({ movie, defaultFavoriteValue, from,clickHandler }
     bg = `green`;
   }
 
-  let image_url = 'https://image.tmdb.org/t/p/original/'
+  let image_url = "https://image.tmdb.org/t/p/original/";
 
-  let movie_poster = movie.poster_2 != null ? image_url + movie.poster_2 : movie.poster != null ? image_url + movie.poster : defaultImg
+  let movie_poster =
+    movie.poster_2 != null
+      ? image_url + movie.poster_2
+      : movie.poster != null
+      ? image_url + movie.poster
+      : defaultImg;
 
   return (
     <Card sx={{ maxWidth: 345 }}>
@@ -96,24 +107,24 @@ export default function Movie({ movie, defaultFavoriteValue, from,clickHandler }
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
-        {isAddedToFavorites ?
-          <IconButton
-            aria-label="Remove from favorites"
-          >
+        {isAddedToFavorites ? (
+          <IconButton aria-label="Remove from favorites">
             <FontAwesomeIcon
               icon={faTrash}
-              onClick={() => {clickHandler(movie.id); setIsAddedToFavorites(!isAddedToFavorites)}}
-            />
-          </IconButton> :
-          <IconButton
-            aria-label="add to favorites" 
-          >
-            <FontAwesomeIcon
-              icon={faHeart}
-              onClick={() =>  addToFavorites(movie)}
+              onClick={() => {
+                clickHandler(movie.id);
+                setIsAddedToFavorites(!isAddedToFavorites);
+              }}
             />
           </IconButton>
-        }
+        ) : (
+          <IconButton aria-label="add to favorites">
+            <FontAwesomeIcon
+              icon={faHeart}
+              onClick={() => addToFavorites(movie)}
+            />
+          </IconButton>
+        )}
         <ExpandMore
           expand={expanded}
           onClick={handleExpandClick}
